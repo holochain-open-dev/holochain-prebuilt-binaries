@@ -18,6 +18,9 @@ jobs:
         with:
           repository: holochain/holochain
           ref: ${{ github.event.client_payload.ref }}
+      - uses: cachix/install-nix-action@v22
+        with:
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
       - name: "Build"
         env:
           system: ${{ matrix.platform.system }}
