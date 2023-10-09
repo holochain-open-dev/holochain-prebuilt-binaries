@@ -44,7 +44,11 @@ jobs:
           path: |
             target/release/lair-keystore
           if-no-files-found: error
-      - name: View directory contents
+      - name: View directory contents (unix)
+        if: matrix.platform == 'ubuntu-20.04' || matrix.platform == 'macos-11'
+        run: |
+          ls -lR
+      - name: View directory contents (dos)
         if: matrix.platform == 'windows-2022'
         run: |
           tree .
