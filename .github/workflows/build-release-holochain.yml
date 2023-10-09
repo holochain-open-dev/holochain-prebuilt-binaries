@@ -1,10 +1,9 @@
 on:
   repository_dispatch:
-    types: [new_holochain_release]
-
-
+    types: [holochain_release]
+    
 jobs:
-  build-holochain:
+  build:
     permissions:
       contents: write
     strategy:
@@ -32,7 +31,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: holochain/holochain
-          ref: ${{ github.event.client_payload.holochain_ref }}
+          ref: ${{ github.event.client_payload.ref }}
       - uses: cachix/install-nix-action@v22
       - name: "Build"
         run: |
@@ -45,46 +44,6 @@ jobs:
             target/release/holochain
             target/release/hc
           if-no-files-found: error
-  build-lair:
-    permissions:
-      contents: write
-    strategy:
-      fail-fast: false
-      matrix:
-        platform: [windows-2019, macos-11, ubuntu-20.04]
-    env:
-      MACOSX_DEPLOYMENT_TARGET: 10.13
-    runs-on: ${{ matrix.platform }}
-    steps:
-      - name: install Rust stable
-        uses: actions-rs/toolchain@v1
-        with:
-          override: true
-          toolchain: stable
-      - name: install Go stable
-        uses: actions/setup-go@v4
-        with:
-          go-version: 'stable'
-      - name: install dependencies (ubuntu only)
-        if: matrix.platform == 'ubuntu-20.04'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y build-essential libssl-dev
-      - uses: actions/checkout@v4
-        with:
-          repository: holochain/lair
-          ref: ${{ github.event.client_payload.lair_ref }}
-      - uses: cachix/install-nix-action@v22
-      - name: "Build"
-        run: |
-          cargo build --release --bin lair-keystore
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: artifacts
-          path: |
-            target/release/lair-keystore
-          if-no-files-found: error
   release:
     permissions:
       contents: write
@@ -92,8 +51,7 @@ jobs:
       fail-fast: false
     runs-on: ubuntu-latest
     needs:
-      - build-holochain
-      - build-lair
+      - build
     steps:
       - uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4
       - name: Download all artifacts
@@ -102,14 +60,13 @@ jobs:
           path: |
             artifacts/holochain
             artifacts/hc
-            artifacts/lair-keystore
       - name: release
         uses: actions/create-release@v1
         id: create_release
         with:
           draft: true
           prerelease: false
-          release_name: Prebuilt Binaries - ${{ github.event.client_payload.ref }}
+          release_name: Holochain - ${{ github.event.client_payload.ref }}
           tag_name: ${{ github.event.client_payload.ref }}
           body_path: CHANGELOG.md
         env:
