@@ -22,8 +22,6 @@ jobs:
           repository: holochain/holochain
           ref: ${{ github.event.client_payload.ref }}
       - uses: cachix/install-nix-action@v22
-        with:
-          github_access_token: ${{ secrets.GITHUB_TOKEN }}
       - name: "Build"
         run: |
           nix develop --command bash -c "cargo build --target ${{ matrix.settings.target }} --release --bin holochain --bin hc --bin lair-keystore"
