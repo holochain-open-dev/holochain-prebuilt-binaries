@@ -3,8 +3,8 @@ on:
     types: [new_holochain_release]
 
 jobs:
-  build:
-    name: build-${{ matrix.settings.target }}
+  build-holochain:
+    name: build-holochain-${{ matrix.settings.target }}
     strategy:
       fail-fast: false
       matrix:
@@ -22,7 +22,7 @@ jobs:
       - uses: cachix/install-nix-action@v22
       - name: "Build"
         run: |
-          nix develop --command bash -c "cargo build --target ${{ matrix.settings.target }} --release --bin holochain --bin hc --bin lair-keystore"
+          nix develop --command bash -c "cargo build --target ${{ matrix.settings.target }} --release --bin holochain --bin hc"
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
@@ -30,13 +30,40 @@ jobs:
           path: |
             target/release/holochain
             target/release/hc
+          if-no-files-found: error
+  build-lair:
+    name: build-lair-${{ matrix.settings.target }}
+    strategy:
+      fail-fast: false
+      matrix:
+        settings:
+          - host: macos-latest
+            target: x86_64-apple-darwin
+          - host: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+    runs-on: ${{ matrix.settings.host }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: holochain/lair
+          ref: ${{ github.event.client_payload.ref }}
+      - uses: cachix/install-nix-action@v22
+      - name: "Build"
+        run: |
+          nix develop --command bash -c "cargo build --target ${{ matrix.settings.target }} --release --bin lair-keystore"
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: artifacts-${{ github.event.client_payload.ref }}-${{ matrix.settings.target }}
+          path: |
             target/release/lair-keystore
           if-no-files-found: error
   release:
     name: Release
     runs-on: ubuntu-latest
     needs:
-      - build
+      - build-holochain
+      - build-lair
     steps:
       - uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4
       - name: Download all artifacts
