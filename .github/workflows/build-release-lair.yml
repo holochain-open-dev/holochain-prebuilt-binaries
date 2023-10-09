@@ -43,6 +43,10 @@ jobs:
           path: |
             target/release/lair-keystore
           if-no-files-found: error
+      - name: View directory contents
+        if: matrix.platform == 'windows-2022'
+        run: |
+          dir /s /b /o:gn
       - name: Upload artifacts (dos paths)
         if: matrix.platform == 'windows-2022'
         uses: actions/upload-artifact@v3
