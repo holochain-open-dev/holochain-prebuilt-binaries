@@ -32,9 +32,10 @@ jobs:
         with:
           repository: holochain/lair
           ref: ${{ github.event.client_payload.lair_ref }}
-      - name: "Build"
-        run: |
-          cargo build --release --bin lair-keystore
+      - uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --release --bin lair-keystore
       - name: Upload artifacts (unix paths)
         if: matrix.platform == 'ubuntu-20.04' || matrix.platform == 'macos-11'
         uses: actions/upload-artifact@v3
