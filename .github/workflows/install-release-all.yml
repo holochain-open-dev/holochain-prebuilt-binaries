@@ -10,14 +10,12 @@ jobs:
       fail-fast: true
       matrix:
         platforms: 
-          - host: macos-11
-            target: x86_64-apple-darwin
+          - host: macos-13
+            target: aarch-apple-darwin
           - host: ubuntu-20.04
             target: x86_64-unknown-linux-gnu
           - host: windows-2019
             target: x86_64-pc-windows-msvc
-    env:
-      MACOSX_DEPLOYMENT_TARGET: 10.13
     runs-on: ${{ matrix.platforms.host }}
     steps:
       - name: install Rust stable
@@ -62,7 +60,7 @@ jobs:
           Copy-Item $HcPath -Destination binaries/hc-v${{ github.event.client_payload.hc_version }}-${{ matrix.platforms.target }}.exe
 
       - name: Build binaries (Linux & Macos only)
-        if: matrix.platforms.host == 'macos-11' || matrix.platforms.host == 'ubuntu-20.04'
+        if: matrix.platforms.host == 'macos-13' || matrix.platforms.host == 'ubuntu-20.04'
         run: |
           cargo install --version ${{ github.event.client_payload.lair_version }} lair_keystore
           LAIR_PATH=$(which lair-keystore)
