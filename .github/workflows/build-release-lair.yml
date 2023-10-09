@@ -40,7 +40,7 @@ jobs:
         if: matrix.platform == 'ubuntu-20.04' || matrix.platform == 'macos-11'
         uses: actions/upload-artifact@v3
         with:
-          name: artifact-${{ matrix-platform }}
+          name: artifact-${{ matrix.platform }}
           path: target/release/lair-keystore
           if-no-files-found: error
   release:
