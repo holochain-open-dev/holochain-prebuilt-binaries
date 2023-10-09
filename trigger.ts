@@ -2,11 +2,16 @@ import axios, { AxiosError, AxiosResponse } from "axios";
 import {Octokit} from "octokit";
 import 'dotenv/config';
 
-const RELEASE_NAME = process.argv[3];
+const TAG_HC = process.argv[3];
+const TAG_LAIR = process.argv[4];
 
 async function main() {
-  if(!RELEASE_NAME) {
-    console.error("Error: Set a release name");
+  if(!TAG_HC) {
+    console.error("Error: Set a holochain release tag");
+    process.exit();
+  }
+  if(!TAG_LAIR) {
+    console.error("Error: Set a lair release tag");
     process.exit();
   }
 
@@ -20,7 +25,8 @@ async function main() {
       repo: 'holochain-prebuilt-binaries',
       event_type: 'new_holochain_release',
       client_payload: {
-        ref: RELEASE_NAME
+        holochain_ref: TAG_HC,
+        lair_ref: TAG_LAIR,
       },
       headers: {
         'X-GitHub-Api-Version': '2022-11-28'

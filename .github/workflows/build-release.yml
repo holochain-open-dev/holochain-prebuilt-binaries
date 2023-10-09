@@ -32,7 +32,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: holochain/holochain
-          ref: ${{ github.event.client_payload.ref }}
+          ref: ${{ github.event.client_payload.holochain_ref }}
       - uses: cachix/install-nix-action@v22
       - name: "Build"
         run: |
@@ -73,7 +73,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: holochain/lair
-          ref: ${{ github.event.client_payload.ref }}
+          ref: ${{ github.event.client_payload.lair_ref }}
       - uses: cachix/install-nix-action@v22
       - name: "Build"
         run: |
