@@ -35,12 +35,21 @@ jobs:
       - name: "Build"
         run: |
           cargo build --release --bin lair-keystore
-      - name: Upload artifacts
+      - name: Upload artifacts (unix paths)
+        if: matrix.platform == 'ubuntu-20.04' || matrix.platform == 'macos-11'
         uses: actions/upload-artifact@v3
         with:
           name: artifacts
           path: |
             target/release/lair-keystore
+          if-no-files-found: error
+      - name: Upload artifacts (dos paths)
+        if: matrix.platform == 'windows-2022'
+        uses: actions/upload-artifact@v3
+        with:
+          name: artifacts
+          path: |
+            target\release\lair-keystore
           if-no-files-found: error
   release:
     permissions:
