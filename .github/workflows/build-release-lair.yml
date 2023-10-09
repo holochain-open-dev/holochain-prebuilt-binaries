@@ -32,7 +32,6 @@ jobs:
         with:
           repository: holochain/lair
           ref: ${{ github.event.client_payload.lair_ref }}
-      - uses: cachix/install-nix-action@v22
       - name: "Build"
         run: |
           cargo build --release --bin lair-keystore

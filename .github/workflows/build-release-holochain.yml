@@ -32,7 +32,6 @@ jobs:
         with:
           repository: holochain/holochain
           ref: ${{ github.event.client_payload.ref }}
-      - uses: cachix/install-nix-action@v22
       - name: "Build"
         run: |
           cargo build --release --bin holochain --bin hc
