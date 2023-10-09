@@ -40,6 +40,7 @@ jobs:
         if: matrix.platform == 'ubuntu-20.04' || matrix.platform == 'macos-11'
         uses: actions/upload-artifact@v3
         with:
+          name: artifact-${{ matrix-platform }}
           path: target/release/lair-keystore
           if-no-files-found: error
   release:
@@ -58,7 +59,7 @@ jobs:
         run: ls -R
       - uses: ncipollo/release-action@v1
         with:
-          artifacts: "artifact/lair-keystore"
+          artifacts: "artifact-*/lair-keystore"
           name: Lair - ${{ github.event.client_payload.ref }}
           body: "Lair binaries built from ${{ github.event.client_payload.ref }}"
           tag: "lair-${{ github.event.client_payload.ref }}"
