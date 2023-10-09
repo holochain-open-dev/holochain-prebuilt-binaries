@@ -31,7 +31,7 @@ async function main() {
         'X-GitHub-Api-Version': '2022-11-28'
       }
     });
-    console.log(`Triggered build-release-${REPOSITORY_NAME}`);
+    console.log(`Triggered workflow 'build-release-${REPOSITORY_NAME}' on tag '${RELEASE_TAG}'` );
   } catch(e) {
     //@ts-ignore
     console.error(e);
