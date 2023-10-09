@@ -9,10 +9,14 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        platform: [macos-11, ubuntu-20.04]
+        platforms: 
+          - host: macos-11
+            target: x86_64-unknown-linux-gnu
+          - host: ubuntu-20.04
+            target: x86_64-apple-darwin
     env:
       MACOSX_DEPLOYMENT_TARGET: 10.13
-    runs-on: ${{ matrix.platform }}
+    runs-on: ${{ matrix.platforms.host }}
     steps:
       - name: install Rust stable
         uses: actions-rs/toolchain@v1
@@ -24,7 +28,7 @@ jobs:
         with:
           go-version: 'stable'
       - name: install dependencies (ubuntu only)
-        if: matrix.platform == 'ubuntu-20.04'
+        if: matrix.platforms.host == 'ubuntu-20.04'
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential libssl-dev
@@ -35,13 +39,15 @@ jobs:
       - uses: actions-rs/cargo@v1
         with:
           command: build
-          args: --release --bin lair-keystore
+          args: --release --bin lair-keystore --target ${{ matrix.platforms.target }}
+      - name: Rename artifact
+        run: |
+          mv target/release/lair-keystore target/release/lair-keystore-${{ matrix.platforms.target }}
       - name: Upload artifacts (unix paths)
-        if: matrix.platform == 'ubuntu-20.04' || matrix.platform == 'macos-11'
+        if: matrix.platforms.host == 'ubuntu-20.04' || matrix.platforms.host == 'macos-11'
         uses: actions/upload-artifact@v3
         with:
-          name: artifact-${{ matrix.platform }}
-          path: target/release/lair-keystore
+          path: target/release/lair-keystore-*
           if-no-files-found: error
   release:
     permissions:
@@ -59,7 +65,7 @@ jobs:
         run: ls -R
       - uses: ncipollo/release-action@v1
         with:
-          artifacts: "artifact-*/lair-keystore"
+          artifacts: "artifact/lair-keystore-*"
           name: Lair - ${{ github.event.client_payload.ref }}
           body: "Lair binaries built from ${{ github.event.client_payload.ref }}"
           tag: "lair-${{ github.event.client_payload.ref }}"
