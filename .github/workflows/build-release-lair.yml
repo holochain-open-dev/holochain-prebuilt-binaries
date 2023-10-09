@@ -1,6 +1,6 @@
 on:
   repository_dispatch:
-    types: [lair_release]
+    types: [build-release-lair]
 
 jobs: 
   build:

@@ -23,7 +23,7 @@ async function main() {
     await octokit.request('POST /repos/{owner}/{repo}/dispatches', {
       owner: 'buildyourwebapp',
       repo: 'holochain-prebuilt-binaries',
-      event_type: `${REPOSITORY_NAME}_release`,
+      event_type: `build-release-${REPOSITORY_NAME}`,
       client_payload: {
         ref: RELEASE_TAG,
       },

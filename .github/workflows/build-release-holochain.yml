@@ -1,6 +1,6 @@
 on:
   repository_dispatch:
-    types: [holochain_release]
+    types: [build-release-holochain]
 
 jobs: 
   build:

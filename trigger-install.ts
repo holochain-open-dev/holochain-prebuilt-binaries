@@ -4,8 +4,6 @@ import { Command } from 'commander';
 import 'dotenv/config';
 
 
-
-
 async function main() {
   const program = new Command();
   program
@@ -27,7 +25,7 @@ async function main() {
     await octokit.request('POST /repos/{owner}/{repo}/dispatches', {
       owner: 'buildyourwebapp',
       repo: 'holochain-prebuilt-binaries',
-      event_type: `all_install_release`,
+      event_type: `install-release-all`,
       client_payload: {
         lair_version,
         holochain_version,

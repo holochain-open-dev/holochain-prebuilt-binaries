@@ -1,6 +1,6 @@
 on:
   repository_dispatch:
-    types: [all_release]
+    types: [install-release-all]
 
 jobs: 
   build:
