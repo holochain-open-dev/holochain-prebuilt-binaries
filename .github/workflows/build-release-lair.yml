@@ -46,7 +46,7 @@ jobs:
       - name: View directory contents
         if: matrix.platform == 'windows-2022'
         run: |
-          dir /s /b /o:gn
+          tree .
       - name: Upload artifacts (dos paths)
         if: matrix.platform == 'windows-2022'
         uses: actions/upload-artifact@v3
