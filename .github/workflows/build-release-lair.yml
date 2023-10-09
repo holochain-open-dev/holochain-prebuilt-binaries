@@ -23,6 +23,7 @@ jobs:
         with:
           override: true
           toolchain: stable
+          target: ${{ matrix.platforms.target }}
       - name: install Go stable
         uses: actions/setup-go@v4
         with:
