@@ -59,14 +59,12 @@ jobs:
         with:
           path: |
             artifacts/lair-keystore
-      - name: release
-        uses: actions/create-release@v1
-        id: create_release
+      - uses: ncipollo/release-action@v1
         with:
+          artifacts: "artifacts/lair-keystore"
+          name: Lair - ${{ github.event.client_payload.ref }}
+          body: "Lair binaries built from ${{ github.event.client_payload.ref }}"
+          tag: "lair-${{ github.event.client_payload.ref }}"
           draft: true
           prerelease: false
-          release_name: Lair - ${{ github.event.client_payload.ref }}
-          tag_name: ${{ github.event.client_payload.ref }}
-          body_path: CHANGELOG.md
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          skipIfReleaseExists: true

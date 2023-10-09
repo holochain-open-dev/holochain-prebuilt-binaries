@@ -60,14 +60,12 @@ jobs:
           path: |
             artifacts/holochain
             artifacts/hc
-      - name: release
-        uses: actions/create-release@v1
-        id: create_release
+      - uses: ncipollo/release-action@v1
         with:
+          artifacts: "artifacts/holochain,artifacts/hc"
+          name: Holochain - ${{ github.event.client_payload.ref }}
+          body: "Holochain binaries built from ${{ github.event.client_payload.ref }}"
+          tag: "holochain-${{ github.event.client_payload.ref }}"
           draft: true
           prerelease: false
-          release_name: Holochain - ${{ github.event.client_payload.ref }}
-          tag_name: ${{ github.event.client_payload.ref }}
-          body_path: CHANGELOG.md
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          skipIfReleaseExists: true
