@@ -11,9 +11,9 @@ jobs:
       matrix:
         platforms: 
           - host: macos-11
-            target: x86_64-unknown-linux-gnu
-          - host: ubuntu-20.04
             target: x86_64-apple-darwin
+          - host: ubuntu-20.04
+            target: x86_64-unknown-linux-gnu
           - host: windows-2019
             target: x86_64-pc-windows-msvc
     env:
@@ -73,15 +73,14 @@ jobs:
           cp $HOLOCHAIN_PATH binaries/holochain-v${{ github.event.client_payload.holochain_version }}-${{ matrix.platforms.target }}
 
           cargo install holochain_cli --version ${{ github.event.client_payload.hc_version }} --features sqlite-encrypted
-          HOLOCHAIN_PATH=$(which hc)
-          cp $HOLOCHAIN_PATH binaries/hc-v${{ github.event.client_payload.hc_version }}-${{ matrix.platforms.target }}
+          HC_PATH=$(which hc)
+          cp $HC_PATH binaries/hc-v${{ github.event.client_payload.hc_version }}-${{ matrix.platforms.target }}
 
       - name: Rename artifact
         run: |
           mv binaries/lair-keystore binaries/lair-keystore-${{ matrix.platforms.target }}
-          mv binaries/hc binaries/hc-${{ matrix.platforms.target }}
           mv binaries/holochain binaries/holochain-${{ matrix.platforms.target }}
-
+          mv binaries/hc binaries/hc-${{ matrix.platforms.target }}
       - name: Upload artifacts (unix paths)
         if: matrix.platforms.host == 'ubuntu-20.04' || matrix.platforms.host == 'macos-11'
         uses: actions/upload-artifact@v3
