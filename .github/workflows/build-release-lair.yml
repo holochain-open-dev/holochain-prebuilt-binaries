@@ -23,7 +23,6 @@ jobs:
         with:
           override: true
           toolchain: stable
-          target: ${{ matrix.platforms.target }}
       - name: install Go stable
         uses: actions/setup-go@v4
         with:
@@ -40,7 +39,7 @@ jobs:
       - uses: actions-rs/cargo@v1
         with:
           command: build
-          args: --release --bin lair-keystore --target ${{ matrix.platforms.target }}
+          args: --release --bin lair-keystore
       - name: Rename artifact
         run: |
           mv target/release/lair-keystore target/release/lair-keystore-${{ matrix.platforms.target }}
