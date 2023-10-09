@@ -9,7 +9,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        platform: [windows-2022, macos-11, ubuntu-20.04]
+        platform: [macos-11, ubuntu-20.04]
     env:
       MACOSX_DEPLOYMENT_TARGET: 10.13
     runs-on: ${{ matrix.platform }}
@@ -32,9 +32,10 @@ jobs:
         with:
           repository: holochain/holochain
           ref: ${{ github.event.client_payload.ref }}
-      - name: "Build"
-        run: |
-          cargo build --release --bin holochain --bin hc
+      - uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --release --bin holochain --bin hc
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:

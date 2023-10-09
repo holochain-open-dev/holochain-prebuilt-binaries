@@ -9,7 +9,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        platform: [windows-2022, macos-11, ubuntu-20.04]
+        platform: [macos-11, ubuntu-20.04]
     env:
       MACOSX_DEPLOYMENT_TARGET: 10.13
     runs-on: ${{ matrix.platform }}
@@ -43,22 +43,6 @@ jobs:
           name: artifacts
           path: |
             target/release/lair-keystore
-          if-no-files-found: error
-      - name: View directory contents (unix)
-        if: matrix.platform == 'ubuntu-20.04' || matrix.platform == 'macos-11'
-        run: |
-          ls -lR
-      - name: View directory contents (dos)
-        if: matrix.platform == 'windows-2022'
-        run: |
-          tree .
-      - name: Upload artifacts (dos paths)
-        if: matrix.platform == 'windows-2022'
-        uses: actions/upload-artifact@v3
-        with:
-          name: artifacts
-          path: |
-            target\release\lair-keystore
           if-no-files-found: error
   release:
     permissions:
