@@ -10,8 +10,6 @@ jobs:
       fail-fast: true
       matrix:
         platforms: 
-          - host: macos-13
-            target: aarch-apple-darwin
           - host: ubuntu-20.04
             target: x86_64-unknown-linux-gnu
           - host: windows-2019
