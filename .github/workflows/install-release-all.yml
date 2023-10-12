@@ -10,10 +10,14 @@ jobs:
       fail-fast: true
       matrix:
         platforms: 
+          - host: macos-13
+            target: aarch-apple-darwin
           - host: ubuntu-20.04
             target: x86_64-unknown-linux-gnu
           - host: windows-2019
             target: x86_64-pc-windows-msvc
+    env:
+      MACOSX_DEPLOYMENT_TARGET: 10.13
     runs-on: ${{ matrix.platforms.host }}
     steps:
       - name: install Rust stable
@@ -53,7 +57,7 @@ jobs:
           $HcPath = Get-Command holochain | Select-Object -ExpandProperty Definition
           Copy-Item $HcPath -Destination binaries/holochain-v${{ github.event.client_payload.holochain_version }}-${{ matrix.platforms.target }}.exe
 
-          cargo install holochain_cli --version ${{ github.event.client_payload.hc_version }} --features sqlite-encrypted
+          cargo install holochain_cli --version ${{ github.event.client_payload.hc_version }}
           $HcPath = Get-Command hc | Select-Object -ExpandProperty Definition
           Copy-Item $HcPath -Destination binaries/hc-v${{ github.event.client_payload.hc_version }}-${{ matrix.platforms.target }}.exe
 
@@ -68,7 +72,7 @@ jobs:
           HOLOCHAIN_PATH=$(which holochain)
           cp $HOLOCHAIN_PATH binaries/holochain-v${{ github.event.client_payload.holochain_version }}-${{ matrix.platforms.target }}
 
-          cargo install holochain_cli --version ${{ github.event.client_payload.hc_version }} --features sqlite-encrypted
+          cargo install holochain_cli --version ${{ github.event.client_payload.hc_version }}
           HC_PATH=$(which hc)
           cp $HC_PATH binaries/hc-v${{ github.event.client_payload.hc_version }}-${{ matrix.platforms.target }}
 
