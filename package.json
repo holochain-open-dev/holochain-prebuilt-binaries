@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "trigger": "ts-node trigger-install.ts"
+    "trigger": "ts-node trigger.ts"
   },
   "author": "",
   "license": "CAL-1.0",

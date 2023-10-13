@@ -1,19 +1,21 @@
 import axios, { AxiosError, AxiosResponse } from "axios";
 import {Octokit} from "octokit";
+import { Command } from 'commander';
 import 'dotenv/config';
 
-const REPOSITORY_NAME = process.argv[3];
-const RELEASE_TAG = process.argv[4];
 
 async function main() {
-  if(!REPOSITORY_NAME || !['holochain','lair'].includes(REPOSITORY_NAME)) {
-    console.error("Error: Specify a repository 'holochain' or 'lair'");
-    process.exit();
-  }
-  if(!RELEASE_TAG) {
-    console.error("Error: Specify a release tag");
-    process.exit();
-  }
+  const program = new Command();
+  program
+    .name('trigger')
+    .description('Trigger github action to install, build, and publish holochain prebuilt binaries')
+    .version('1.0.0')
+    .requiredOption('-c, --hc_version <string>', 'holochain_cli version')
+    .requiredOption('-h, --holochain_version <string>', 'holochain version')
+    .requiredOption('-l, --lair_version <string>', 'lair-keystore version');
+  program.parse();
+
+  const { lair_version, holochain_version, hc_version } = program.opts();
 
   const octokit = new Octokit({
     auth: process.env.GITHUB_AUTH_TOKEN
@@ -23,15 +25,17 @@ async function main() {
     await octokit.request('POST /repos/{owner}/{repo}/dispatches', {
       owner: 'buildyourwebapp',
       repo: 'holochain-prebuilt-binaries',
-      event_type: `build-release-${REPOSITORY_NAME}`,
+      event_type: `install-release-all`,
       client_payload: {
-        ref: RELEASE_TAG,
+        lair_version,
+        holochain_version,
+        hc_version,
       },
       headers: {
         'X-GitHub-Api-Version': '2022-11-28'
       }
     });
-    console.log(`Triggered workflow 'build-release-${REPOSITORY_NAME}' on tag '${RELEASE_TAG}'` );
+    console.log(`Triggered workflow for lair-keystore v${lair_version}, holochain_cli v${hc_version}, holochain v${holochain_version}` );
   } catch(e) {
     //@ts-ignore
     console.error(e);
