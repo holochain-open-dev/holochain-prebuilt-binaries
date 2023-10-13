@@ -93,7 +93,10 @@ jobs:
         run: ls -R
       - uses: ncipollo/release-action@v1
         with:
-          artifacts: "artifact/lair-keystore-*"
+          artifacts: |
+            "artifact/holochain-*"
+            "artifact/hc-*"
+            "artifact/lair-keystore-*"
           name: Prebuilt Binaries for Holochain ${{ github.event.client_payload.holochain_version }}
           body: "Holochain, Holochain CLI & Lair Keystore binaries compatible with holochain ${{ github.event.client_payload.holochain_version }}"
           tag: "${{ github.event.client_payload.holochain_version }}"
