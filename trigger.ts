@@ -23,7 +23,7 @@ async function main() {
 
   try {
     await octokit.request('POST /repos/{owner}/{repo}/dispatches', {
-      owner: 'buildyourwebapp',
+      owner: 'holochain-open-dev',
       repo: 'holochain-prebuilt-binaries',
       event_type: `install-release-all`,
       client_payload: {
