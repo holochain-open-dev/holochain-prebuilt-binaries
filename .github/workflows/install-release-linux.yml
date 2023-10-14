@@ -1,6 +1,6 @@
 on:
   repository_dispatch:
-    types: [install-release-single]
+    types: [install-release-linux]
 
 jobs: 
   build:
