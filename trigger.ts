@@ -12,10 +12,11 @@ async function main() {
     .version('1.0.0')
     .requiredOption('-c, --hc_version <string>', 'holochain_cli version')
     .requiredOption('-h, --holochain_version <string>', 'holochain version')
-    .requiredOption('-l, --lair_version <string>', 'lair-keystore version');
+    .requiredOption('-l, --lair_version <string>', 'lair-keystore version')
+    .option('--linux-only', 'Only build & release for linux');
   program.parse();
 
-  const { lair_version, holochain_version, hc_version } = program.opts();
+  const { lair_version, holochain_version, hc_version, linuxOnly } = program.opts();
 
   const octokit = new Octokit({
     auth: process.env.GITHUB_AUTH_TOKEN
@@ -25,7 +26,7 @@ async function main() {
     await octokit.request('POST /repos/{owner}/{repo}/dispatches', {
       owner: 'holochain-open-dev',
       repo: 'holochain-prebuilt-binaries',
-      event_type: `install-release-all`,
+      event_type: linuxOnly ? 'install-release-linux' : 'install-release-all',
       client_payload: {
         lair_version,
         holochain_version,

@@ -1,0 +1,92 @@
+on:
+  repository_dispatch:
+    types: [install-release-single]
+
+jobs: 
+  build:
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: true
+      matrix:
+        platforms: 
+          - host: ubuntu-22.04
+            target: x86_64-unknown-linux-gnu
+    env:
+      MACOSX_DEPLOYMENT_TARGET: 10.13
+    runs-on: ${{ matrix.platforms.host }}
+    steps:
+      - name: install Rust stable
+        uses: actions-rs/toolchain@v1
+        with:
+          override: true
+          toolchain: stable
+      - name: install Go stable
+        uses: actions/setup-go@v4
+        with:
+          go-version: 'stable'
+      - name: install dependencies (ubuntu only)
+        if: matrix.platforms.host == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential libssl-dev
+      - name: Create build output dir
+        run: |
+          mkdir binaries
+      - name: Build binaries (Windows only)
+        if: matrix.platforms.host == 'windows-2019'
+        run: |          
+          cargo install --version ${{ github.event.client_payload.lair_version }} lair_keystore
+          $LkPath = Get-Command lair-keystore | Select-Object -ExpandProperty Definition
+          Copy-Item $LkPath -Destination binaries/lair-keystore-v${{ github.event.client_payload.lair_version }}-${{ matrix.platforms.target }}.exe
+
+          cargo install holochain --version ${{ github.event.client_payload.holochain_version }} --features sqlite-encrypted
+          $HcPath = Get-Command holochain | Select-Object -ExpandProperty Definition
+          Copy-Item $HcPath -Destination binaries/holochain-v${{ github.event.client_payload.holochain_version }}-${{ matrix.platforms.target }}.exe
+
+          cargo install holochain_cli --version ${{ github.event.client_payload.hc_version }}
+          $HcPath = Get-Command hc | Select-Object -ExpandProperty Definition
+          Copy-Item $HcPath -Destination binaries/hc-v${{ github.event.client_payload.hc_version }}-${{ matrix.platforms.target }}.exe
+
+      - name: Build binaries (Linux & Macos only)
+        if: matrix.platforms.host == 'macos-11' || matrix.platforms.host == 'macos-13' || matrix.platforms.host == 'ubuntu-22.04'
+        run: |
+          cargo install --version ${{ github.event.client_payload.lair_version }} lair_keystore
+          LAIR_PATH=$(which lair-keystore)
+          mv $LAIR_PATH binaries/lair-keystore-v${{ github.event.client_payload.lair_version }}-${{ matrix.platforms.target }}
+
+          cargo install holochain --version ${{ github.event.client_payload.holochain_version }} --features sqlite-encrypted
+          HOLOCHAIN_PATH=$(which holochain)
+          mv $HOLOCHAIN_PATH binaries/holochain-v${{ github.event.client_payload.holochain_version }}-${{ matrix.platforms.target }}
+
+          cargo install holochain_cli --version ${{ github.event.client_payload.hc_version }}
+          HC_PATH=$(which hc)
+          mv $HC_PATH binaries/hc-v${{ github.event.client_payload.hc_version }}-${{ matrix.platforms.target }}
+      
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          path: |
+            binaries/lair-keystore-*
+            binaries/holochain-*
+            binaries/hc-*
+          if-no-files-found: error
+  release:
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+    runs-on: ubuntu-latest
+    needs:
+      - build
+    steps:
+      - uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4
+      - name: Download all artifacts
+        uses: actions/download-artifact@v3
+      - uses: ncipollo/release-action@v1
+        with:
+          artifacts: "artifact/holochain-*,artifact/hc-*,artifact/lair-keystore-*"
+          name: Linux binaries for holochain ${{ github.event.client_payload.holochain_version }}
+          body: "Linux prebuilt binaries for holochain ${{ github.event.client_payload.holochain_version }} -- holochain, hc (holochain_cli) & lair-keystore."
+          tag: "${{ github.event.client_payload.holochain_version }}"
+          draft: true
