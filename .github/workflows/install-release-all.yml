@@ -96,5 +96,3 @@ jobs:
           body: "Prebuilt binaries for holochain ${{ github.event.client_payload.holochain_version }} -- holochain, hc (holochain_cli) & lair-keystore."
           tag: "${{ github.event.client_payload.holochain_version }}"
           draft: true
-          prerelease: false
-          skipIfReleaseExists: true
